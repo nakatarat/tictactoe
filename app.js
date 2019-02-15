@@ -4,17 +4,56 @@ const gameBoard = (() => {
   '','','',
   '','','',];
 
+  const winningIndices = [[0,1,2], [3,4,5], [6,7,8],
+                          [0,3,6], [1,4,7], [2,5,8],
+                          [0,4,8], [2,4,6]];
+
   const gameBoardDOM = [...document.getElementsByTagName('td')];
+  const winnerDisplay = document.querySelector('p');
+
+  const checkWinner = (currentPlayer) => {
+    const markerToCheck = currentPlayer.getMarker();
+    const indices = [];
+    gameBoardArray.forEach((elem, index) => {
+      if(elem === markerToCheck) {
+        indices.push(index);
+      }
+    });
+
+    var winner;
+
+    for(var i = 0; i < 8; i++) {
+      var matchThree = 0;
+      for(var j = 0; j < 3; j++) {
+        if(indices.includes(winningIndices[i][j])){
+          matchThree++;
+          if (matchThree === 3) { break; }
+        } else { break; }
+      }
+
+      if (matchThree === 3) {
+        winner = i;
+        break;
+      }
+    }
+
+    if(winner !== undefined) {
+      return true;
+    }
+    
+  }
 
   const addMarker = function () {
     if(this.className === 'empty') {
       const key = parseInt(this.dataset.key, 10);
       gameBoardArray[key] = playerController.currentPlayer.getMarker();
+      const winnerExists = checkWinner(playerController.currentPlayer);
+      render(winnerExists, playerController.currentPlayer.getName());
       playerController.switchPlayer();
-      render();
     }
   }
 
+  // Add event listeners to each tic tac toe square
   gameBoardDOM.forEach((elem) => {
     elem.addEventListener('click', addMarker);
   });
@@ -34,15 +73,23 @@ const gameBoard = (() => {
     });
   }
 
-  const render = () => {
+
+
+
+  const render = (winnerExists, winner) => {
     gameBoardArray.forEach((elem, index) => {
       gameBoardDOM[index].innerText = elem;
     });
 
     addClass();
+
+    if (winnerExists) {
+      const winnerText = document.createTextNode(`${winner} wins!`);
+      winnerDisplay.appendChild(winnerText);
+    }
   }
 
-  return {gameBoardDOM, render};
+  return {gameBoardDOM, render, gameBoardArray};
 })();
 
 // CREATE PLAYERS
