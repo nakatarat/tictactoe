@@ -11,6 +11,8 @@ const gameBoard = (() => {
   const gameBoardDOM = [...document.getElementsByTagName('td')];
   const winnerDisplay = document.querySelector('p');
 
+  let winnerExists = false;
+
   const checkWinner = (currentPlayer) => {
     const markerToCheck = currentPlayer.getMarker();
     const indices = [];
@@ -38,13 +40,14 @@ const gameBoard = (() => {
     }
 
     if(winner !== undefined) {
+      winnerExists = true;
       return true;
     }
     
   }
 
   const addMarker = function () {
-    if(this.className === 'empty') {
+    if(this.className === 'empty' && !winnerExists) {
       const key = parseInt(this.dataset.key, 10);
       gameBoardArray[key] = playerController.currentPlayer.getMarker();
       const winnerExists = checkWinner(playerController.currentPlayer);
